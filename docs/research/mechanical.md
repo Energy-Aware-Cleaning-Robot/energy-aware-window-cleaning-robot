@@ -65,7 +65,30 @@ Weight reduction will be investigated through:
 
 ### 2.3 CAD Model
 
-![Robot chassis CAD model](/images/chassis.png)
+
+<ClientOnly>
+  <model-viewer
+    src="/energy-aware-window-cleaning-robot/models/chassis.glb"
+    alt="Interactive 3D CAD model of the window cleaning robot chassis"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    exposure="1"
+    interaction-prompt="auto"
+    style="
+      width: 100%;
+      height: 500px;
+      background: #f3f5f8;
+      border-radius: 12px;
+    "
+  ></model-viewer>
+</ClientOnly>
+
+<p style="text-align:center; font-size:14px;">
+  Figure 1: Interactive 3D CAD model of the robot chassis.
+  Drag to rotate and scroll to zoom.
+</p>
+
 
 *Figure 1: Preliminary SolidWorks chassis design.*
 
