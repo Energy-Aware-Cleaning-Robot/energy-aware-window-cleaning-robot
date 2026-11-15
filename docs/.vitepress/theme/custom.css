@@ -18,20 +18,10 @@
   --vp-c-brand-2: #1d4ed8;
 }
 
-/* Keep the report white even if dark mode is selected */
-.dark {
-  --vp-c-bg: #ffffff;
-  --vp-c-bg-alt: #f8fafc;
-  --vp-c-bg-soft: #f3f5f8;
+/* ==========================================
+   MAIN WEBSITE BACKGROUND
+   ========================================== */
 
-  --vp-c-text-1: #1f2937;
-  --vp-c-text-2: #4b5563;
-
-  --vp-c-divider: #e5e7eb;
-  --vp-c-border: #d1d5db;
-}
-
-/* Main report background */
 html,
 body,
 .VPDoc,
@@ -39,7 +29,10 @@ body,
   background-color: #ffffff;
 }
 
-/* Wider documentation layout */
+/* ==========================================
+   DOCUMENTATION WIDTH
+   ========================================== */
+
 @media (min-width: 960px) {
   .VPDoc .container {
     max-width: 1400px !important;
@@ -55,17 +48,13 @@ body,
 }
 
 /* ==========================================
-   INTERACTIVE CAD VIEWER
+   CAD STYLING
    ========================================== */
 
+/*
+  The CAD explorer is styled directly
+  inside RobotCADViewer.vue.
 
-/* Dark-blue 3D model background */
-.cad-stage,
-.cad-model {
-  background: linear-gradient(
-    135deg,
-    #172238 0%,
-    #304666 100%
-  ) !important;
-}
-
+  Do not override .cad-stage or .cad-model
+  here, to avoid conflicting CSS rules.
+*/
