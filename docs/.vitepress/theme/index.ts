@@ -2,14 +2,12 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
 
-const theme: Theme = {
+import RobotCADViewer from './components/RobotCADViewer.vue'
+
+export default {
   extends: DefaultTheme,
 
   enhanceApp({ app }) {
-    if (typeof window !== 'undefined') {
-      import('@google/model-viewer')
-    }
+    app.component('RobotCADViewer', RobotCADViewer)
   }
-}
-
-export default theme
+} satisfies Theme
