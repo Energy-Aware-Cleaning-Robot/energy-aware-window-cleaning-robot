@@ -1,14 +1,31 @@
+
 # Research Methodology
 
-The project will proceed through the following stages:
+The project follows a structured research methodology
+to develop and evaluate energy-aware Coverage Path
+Planning for vertical glass-cleaning robots.
 
-1. Literature review
-2. Define the operating scenario
-3. Develop the robot prototype
-4. Characterise energy consumption
-5. Develop the mathematical energy model
-6. Implement CPP simulation
-7. Compare candidate coverage paths
-8. Develop an energy-aware planner
-9. Conduct experimental validation
-10. Analyse results
+## Research Workflow
+
+1. Literature review and research gap identification.
+2. Define the operating environment.
+3. Develop the low-cost robot prototype.
+4. Characterise locomotion and adhesion energy.
+5. Develop the mathematical energy model.
+6. Implement conventional CPP strategies.
+7. Develop the energy-aware CPP algorithm.
+8. Conduct simulation and sensitivity analysis.
+9. Perform experimental validation.
+10. Compare results and evaluate performance.
+
+## Evaluation Metrics
+
+| Metric | Unit |
+|---|---|
+| Total Energy Consumption | J |
+| Coverage Rate | % |
+| Path Length | m |
+| Number of Turns | - |
+| Completion Time | s |
+| Redundancy | % |
+| Tracking Error | m |

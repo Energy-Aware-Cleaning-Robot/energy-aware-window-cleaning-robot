@@ -63,18 +63,19 @@ Weight reduction will be investigated through:
 - Optimising the suction chamber geometry.
 - Maintaining adequate rigidity around motor mounts.
 
-### 2.3 CAD Model
+### Interactive 3D CAD Model
 
+The following model illustrates the current chassis
+design of the window-cleaning robot.
 
 <ClientOnly>
   <model-viewer
     src="/energy-aware-window-cleaning-robot/models/lightweight-cleaning-robot.glb"
-    alt="Interactive 3D CAD model of the window cleaning robot chassis"
+    alt="Interactive 3D CAD model of the window cleaning robot"
     camera-controls
     auto-rotate
     shadow-intensity="1"
     exposure="1"
-    interaction-prompt="auto"
     style="
       width: 100%;
       height: 500px;
@@ -84,13 +85,8 @@ Weight reduction will be investigated through:
   ></model-viewer>
 </ClientOnly>
 
-<p style="text-align:center; font-size:14px;">
-  Figure 1: Interactive 3D CAD model of the robot chassis.
-  Drag to rotate and scroll to zoom.
-</p>
+*Figure 1: Interactive 3D CAD model of the window-cleaning robot. Drag to rotate and scroll to zoom.*
 
-
-*Figure 1: Preliminary SolidWorks chassis design.*
 
 ## 3. Locomotion System
 
