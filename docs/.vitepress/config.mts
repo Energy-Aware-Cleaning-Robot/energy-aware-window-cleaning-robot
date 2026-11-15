@@ -2,6 +2,11 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+
+  // =========================
+  // WEBSITE INFORMATION
+  // =========================
+
   title: 'Energy-Aware Window Cleaning Robot',
 
   description:
@@ -11,6 +16,21 @@ export default defineConfig({
 
   cleanUrls: true,
 
+  // =========================
+  // WEBSITE APPEARANCE
+  // =========================
+
+  // Disable dark mode and remove the theme toggle.
+  // The website will remain in light mode.
+  // The interactive 3D CAD viewer retains its
+  // own dark-blue background through custom CSS.
+
+  appearance: false,
+
+  // =========================
+  // THEME CONFIGURATION
+  // =========================
+
   themeConfig: {
 
     // =========================
@@ -18,12 +38,30 @@ export default defineConfig({
     // =========================
 
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Research', link: '/research/' },
-      { text: 'Robot Design', link: '/design/' },
-      { text: 'Software', link: '/software/' },
-      { text: 'Results', link: '/results/' },
-      { text: 'Development', link: '/development/' }
+      {
+        text: 'Home',
+        link: '/'
+      },
+      {
+        text: 'Research',
+        link: '/research/'
+      },
+      {
+        text: 'Robot Design',
+        link: '/design/'
+      },
+      {
+        text: 'Software',
+        link: '/software/'
+      },
+      {
+        text: 'Results',
+        link: '/results/'
+      },
+      {
+        text: 'Development',
+        link: '/development/'
+      }
     ],
 
     // =========================
@@ -32,64 +70,115 @@ export default defineConfig({
 
     sidebar: {
 
+      // =========================
       // RESEARCH
+      // =========================
+
       '/research/': [
         {
           text: 'Research',
           collapsed: false,
           items: [
-            { text: 'Overview', link: '/research/' },
-            { text: 'Methodology', link: '/research/methodology' }
+            {
+              text: 'Overview',
+              link: '/research/'
+            },
+            {
+              text: 'Methodology',
+              link: '/research/methodology'
+            }
           ]
         }
       ],
 
+      // =========================
       // ROBOT DESIGN
+      // =========================
+
       '/design/': [
         {
           text: 'Robot Design',
           collapsed: false,
           items: [
-            { text: 'Overview', link: '/design/' },
-            { text: 'Mechanical Design', link: '/design/mechanical' },
-            { text: 'Electrical Design', link: '/design/electrical' },
-            { text: 'Suction System', link: '/design/suction' }
+            {
+              text: 'Overview',
+              link: '/design/'
+            },
+            {
+              text: 'Mechanical Design',
+              link: '/design/mechanical'
+            },
+            {
+              text: 'Electrical Design',
+              link: '/design/electrical'
+            },
+            {
+              text: 'Suction System',
+              link: '/design/suction'
+            }
           ]
         }
       ],
 
-      // SOFTWARE
+      // =========================
+      // SOFTWARE DEVELOPMENT
+      // =========================
+
       '/software/': [
         {
           text: 'Software Development',
           collapsed: false,
           items: [
-            { text: 'Overview', link: '/software/' },
-            { text: 'Energy Model', link: '/software/energy-model' },
-            { text: 'CPP Algorithms', link: '/software/cpp' },
-            { text: 'Simulation', link: '/software/simulation' }
+            {
+              text: 'Overview',
+              link: '/software/'
+            },
+            {
+              text: 'Energy Model',
+              link: '/software/energy-model'
+            },
+            {
+              text: 'CPP Algorithms',
+              link: '/software/cpp'
+            },
+            {
+              text: 'Simulation',
+              link: '/software/simulation'
+            }
           ]
         }
       ],
 
-      // RESULTS
+      // =========================
+      // RESULTS & ANALYSIS
+      // =========================
+
       '/results/': [
         {
           text: 'Results & Analysis',
           collapsed: false,
           items: [
-            { text: 'Overview', link: '/results/' }
+            {
+              text: 'Overview',
+              link: '/results/'
+            }
           ]
         }
       ],
 
-      // DEVELOPMENT
+      // =========================
+      // PROJECT DEVELOPMENT
+      // =========================
+
       '/development/': [
         {
           text: 'Project Development',
           collapsed: false,
           items: [
-            { text: 'Overview', link: '/development/' }
+            {
+              text: 'Overview',
+              link: '/development/'
+            }
           ]
         }
       ]
@@ -107,7 +196,7 @@ export default defineConfig({
     ],
 
     // =========================
-    // SEARCH
+    // LOCAL SEARCH
     // =========================
 
     search: {
@@ -131,6 +220,10 @@ export default defineConfig({
       prev: 'Previous Page',
       next: 'Next Page'
     },
+
+    // =========================
+    // RIGHT-SIDE PAGE OUTLINE
+    // =========================
 
     outline: {
       level: [2, 3],
