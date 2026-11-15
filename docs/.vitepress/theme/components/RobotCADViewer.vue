@@ -16,6 +16,7 @@ import { withBase } from 'vitepress'
 
 type Category = 'Mechanical' | 'Electrical' | 'Control'
 type Axis = 'x' | 'y' | 'z'
+type RangeMode = 'fine' | 'medium' | 'wide' | 'maximum'
 
 interface Coordinates {
   x: number
@@ -48,8 +49,8 @@ const defaultParts: Part[] = [
     id: 'chassis',
     name: 'Chassis',
     category: 'Mechanical',
-    position: '-0.07m 0.015m 0.07m',
-    normal: '0m 1m 0m',
+    position: '0.00075m 0.05187m -0.06642m',
+    normal: '-1.00000m 0.00000m 0.00000m',
     description:
       'Lightweight PLA structural frame supporting the robot components.',
     details: [
@@ -63,8 +64,8 @@ const defaultParts: Part[] = [
     id: 'chamber',
     name: 'Suction Chamber',
     category: 'Mechanical',
-    position: '0m 0.025m 0m',
-    normal: '0m 1m 0m',
+    position: '0.07126m 0.05116m -0.06931m',
+    normal: '0.00000m 1.00000m 0.00000m',
     description:
       'Integrated negative-pressure chamber used to maintain adhesion to vertical glass.',
     details: [
@@ -78,8 +79,8 @@ const defaultParts: Part[] = [
     id: 'frame',
     name: 'Structural Supports',
     category: 'Mechanical',
-    position: '0.075m 0.015m -0.07m',
-    normal: '0m 1m 0m',
+    position: '0.00075m 0.03458m -0.00892m',
+    normal: '-1.00000m 0.00000m 0.00000m',
     description:
       'Structural supports connecting the chassis and providing component mounting locations.',
     details: [
@@ -112,18 +113,38 @@ const category = ref('All')
 const rotating = ref(false)
 
 const editMode = ref(false)
+const placementMode = ref(false)
+const placementMessage = ref('Select a subsystem, then click its surface on the model.')
+const hasUnsavedPlacement = ref(false)
 const editingId = ref('chassis')
 
 const manual = ref<Coordinates>({
-  x: -0.07,
-  y: 0.015,
-  z: 0.07
+  x: 0.00075,
+  y: 0.05187,
+  z: -0.06642
 })
 
 const saveMessage = ref('')
 const exportMessage = ref('')
 
-const STORAGE_KEY = 'window-cleaning-robot-hotspots-v1'
+const STORAGE_KEY = 'window-cleaning-robot-hotspots-v2'
+const LEGACY_STORAGE_KEY = 'window-cleaning-robot-hotspots-v1'
+const newName = ref('')
+const newCategory = ref<Category>('Mechanical')
+const newDescription = ref('')
+const newLink = ref('/design/mechanical')
+const editorMessage = ref('')
+
+// Slider ranges in metres. Maximum is 10,000x the original +/-0.15 m.
+const rangeModes = {
+  fine: { label: 'Fine (+/-0.15 m)', limit: 0.15, step: 0.001 },
+  medium: { label: 'Medium (+/-1.5 m)', limit: 1.5, step: 0.005 },
+  wide: { label: 'Wide (+/-15 m)', limit: 15, step: 0.05 },
+  maximum: { label: '10,000x (+/-1,500 m)', limit: 1500, step: 0.1 }
+} as const
+
+const rangeMode = ref<RangeMode>('fine')
+const activeRange = computed(() => rangeModes[rangeMode.value])
 
 const modelUrl = withBase(
   '/models/lightweight-cleaning-robot.glb'
@@ -180,7 +201,7 @@ function formatPosition(coords: Coordinates): string {
 }
 
 function clamp(value: number): number {
-  return Math.max(-0.5, Math.min(0.5, value))
+  return Math.max(-1500, Math.min(1500, value))
 }
 
 // ==========================================
@@ -313,6 +334,7 @@ function loadEditingCoordinates() {
 
 function toggleEditMode() {
   editMode.value = !editMode.value
+  if (!editMode.value) placementMode.value = false
 
   if (editMode.value) {
     rotating.value = false
@@ -335,6 +357,7 @@ function toggleEditMode() {
 // ==========================================
 
 async function updateAxis(axis: Axis, value: number) {
+  if (placementMode.value) placementMode.value = false
   if (!Number.isFinite(value)) return
 
   manual.value = {
@@ -358,10 +381,80 @@ async function updateAxis(axis: Axis, value: number) {
 }
 
 // ==========================================
+// CLICK-TO-PLACE ON THE 3D MODEL
+// ==========================================
+
+function togglePlacementMode() {
+  if (!editMode.value) {
+    editMode.value = true
+    category.value = 'All'
+  }
+  placementMode.value = !placementMode.value
+  rotating.value = false
+  placementMessage.value = placementMode.value
+    ? 'Click a visible surface on the robot to position the selected hotspot.'
+    : 'Placement mode disabled. Manual sliders remain available.'
+}
+
+async function placeHotspot(event: MouseEvent) {
+  if (!placementMode.value) return
+  const mv = viewer.value
+  if (!mv || !modelReady.value) {
+    placementMessage.value = 'The 3D model has not finished loading.'
+    return
+  }
+  if (typeof mv.positionAndNormalFromPoint !== 'function') {
+    placementMessage.value = 'Surface picking is unavailable in this model-viewer version.'
+    return
+  }
+
+  // model-viewer's API uses browser viewport (client) coordinates.
+  // Existing hotspot buttons are non-interactive during placement.
+  try {
+    const result = mv.positionAndNormalFromPoint(event.clientX, event.clientY)
+    if (!result?.position || !result?.normal) {
+      placementMessage.value = 'No surface found. Click a solid, visible part of the model.'
+      return
+    }
+    const { position, normal } = result
+    const valid = [position.x, position.y, position.z,
+      normal.x, normal.y, normal.z].every(Number.isFinite)
+    if (!valid) {
+      placementMessage.value = 'The model returned invalid coordinates.'
+      return
+    }
+
+    const part = editingPart.value
+    if (!part) return
+    part.position = formatPosition(position)
+    part.normal = formatPosition(normal)
+    manual.value = { x: position.x, y: position.y, z: position.z }
+    selectedId.value = part.id
+    hasUnsavedPlacement.value = true
+    placementMessage.value = `${part.name} placed at ${part.position}. Click SAVE SELECTED POSITION to keep it.`
+    await refreshAllHotspots()
+  } catch (error) {
+    console.error('Click-to-place error:', error)
+    placementMessage.value = 'Placement failed. Check F12 Console for details.'
+  }
+}
+
+async function savePlacedPosition() {
+  const part = editingPart.value
+  if (!part) return
+  part.position = formatPosition(manual.value)
+  await refreshAllHotspots()
+  saveHotspots()
+  hasUnsavedPlacement.value = false
+  placementMessage.value = `${part.name} saved in this browser. Export coordinates for GitHub.`
+}
+
+// ==========================================
 // WATCH EDITING TARGET
 // ==========================================
 
 watch(editingId, async () => {
+  hasUnsavedPlacement.value = false
   loadEditingCoordinates()
 
   selectedId.value = editingId.value
@@ -375,67 +468,99 @@ watch(editingId, async () => {
 
 function saveHotspots() {
   if (typeof window === 'undefined') return
-
-  const data: Record<string, SavedHotspot> = {}
-
-  for (const part of parts.value) {
-    data[part.id] = {
-      position: part.position,
-      normal: part.normal
-    }
-  }
-
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(data)
-    )
-
-    saveMessage.value =
-      'Hotspot positions saved in this browser.'
+    // Store the entire list, including user-created subsystem metadata.
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parts.value))
+    saveMessage.value = 'All hotspot positions and subsystem details saved in this browser.'
+    hasUnsavedPlacement.value = false
   } catch (error) {
-    console.error(
-      'Unable to save hotspot positions:',
-      error
-    )
-
-    saveMessage.value =
-      'Saving failed. Check browser storage permissions.'
+    console.error('Unable to save hotspots:', error)
+    saveMessage.value = 'Saving failed. Check browser storage permissions.'
   }
 }
 
 async function loadHotspots() {
   if (typeof window === 'undefined') return
-
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-
-    if (!stored) return
-
-    const data = JSON.parse(stored) as Record<
-      string,
-      SavedHotspot
-    >
-
-    for (const part of parts.value) {
-      const saved = data[part.id]
-
-      if (!saved) continue
-
-      part.position = saved.position
-      part.normal = saved.normal
+    if (stored) {
+      const data: unknown = JSON.parse(stored)
+      if (Array.isArray(data)) {
+        const valid = data.filter((p): p is Part =>
+          p && typeof p.id === 'string' && typeof p.name === 'string' &&
+          typeof p.position === 'string' && typeof p.normal === 'string' &&
+          ['Mechanical', 'Electrical', 'Control'].includes(p.category) &&
+          typeof p.description === 'string' && Array.isArray(p.details) &&
+          typeof p.link === 'string'
+        )
+        if (valid.length) parts.value = valid
+      }
+    } else {
+      // Do not silently override newly calibrated defaults with old-scale data.
+      // The previous storage key remains untouched for backup purposes.
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)
+      if (legacy) console.info('Previous calibration backup found. New defaults are active.')
     }
-
+    if (!parts.value.some(p => p.id === editingId.value)) {
+      editingId.value = parts.value[0]?.id ?? ''
+    }
     loadEditingCoordinates()
-
   } catch (error) {
-    console.error(
-      'Unable to load hotspot positions:',
-      error
-    )
+    console.error('Unable to load hotspots:', error)
   }
-
   await refreshAllHotspots()
+}
+
+function addHotspot() {
+  const name = newName.value.trim()
+  if (!name) {
+    editorMessage.value = 'Enter a name for the new hotspot.'
+    return
+  }
+  const idBase = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'part'
+  let id = idBase
+  let n = 2
+  while (parts.value.some(p => p.id === id)) id = `${idBase}-${n++}`
+  const part: Part = {
+    id,
+    name,
+    category: newCategory.value,
+    position: '0.07575m 0.05400m -0.07575m',
+    normal: '0m 1m 0m',
+    description: newDescription.value.trim() || `Description of ${name} (edit as required).`,
+    details: ['Subsystem under development'],
+    link: newLink.value.startsWith('/') ? newLink.value : '/design/mechanical'
+  }
+  parts.value.push(part)
+  editingId.value = id
+  selectedId.value = id
+  category.value = 'All'
+  newName.value = ''
+  newDescription.value = ''
+  editorMessage.value = `${name} added. Click START CLICK PLACEMENT to position it.`
+  void refreshAllHotspots()
+  saveHotspots()
+}
+
+function deleteHotspot() {
+  const part = editingPart.value
+  if (!part) return
+  if (typeof window !== 'undefined' && !window.confirm(`Delete hotspot "${part.name}"?`)) return
+  parts.value = parts.value.filter(p => p.id !== part.id)
+  editingId.value = parts.value[0]?.id ?? ''
+  selectedId.value = parts.value[0]?.id ?? null
+  placementMode.value = false
+  loadEditingCoordinates()
+  editorMessage.value = `${part.name} deleted.`
+  saveHotspots()
+  void refreshAllHotspots()
+}
+
+function updatePartDetails() {
+  if (!editingPart.value) return
+  editingPart.value.name = editingPart.value.name.trim() || editingPart.value.id
+  saveHotspots()
+  editorMessage.value = 'Subsystem information saved.'
 }
 
 // ==========================================
@@ -443,6 +568,7 @@ async function loadHotspots() {
 // ==========================================
 
 async function savePosition() {
+  hasUnsavedPlacement.value = false
   if (!editingPart.value) return
 
   editingPart.value.position =
@@ -458,6 +584,7 @@ async function savePosition() {
 // ==========================================
 
 async function resetPosition() {
+  hasUnsavedPlacement.value = false
   const original = defaultParts.find(
     part => part.id === editingId.value
   )
@@ -484,6 +611,7 @@ async function resetPosition() {
 // ==========================================
 
 async function resetAllPositions() {
+  hasUnsavedPlacement.value = false
   for (const part of parts.value) {
     const original = defaultParts.find(
       item => item.id === part.id
@@ -502,7 +630,7 @@ async function resetAllPositions() {
   saveHotspots()
 
   saveMessage.value =
-    'All hotspot positions reset to defaults.'
+    'Original hotspots reset. Added hotspots are retained.'
 }
 
 // ==========================================
@@ -510,14 +638,8 @@ async function resetAllPositions() {
 // ==========================================
 
 function generateExport(): string {
-  return parts.value.map(part => {
-    return [
-      `// ${part.name}`,
-      `id: '${part.id}',`,
-      `position: '${part.position}',`,
-      `normal: '${part.normal}',`
-    ].join('\n')
-  }).join('\n\n')
+  // A complete valid TypeScript array, including newly added hotspots.
+  return `const defaultParts: Part[] = ${JSON.stringify(parts.value, null, 2)}`
 }
 
 async function exportCoordinates() {
@@ -568,12 +690,14 @@ onMounted(async () => {
             ref="viewer"
             :src="modelUrl"
             alt="Interactive 3D CAD model of the window-cleaning robot"
-            camera-controls
+            :camera-controls="!placementMode"
             :auto-rotate="rotating"
             shadow-intensity="0.8"
             exposure="0.9"
             environment-image="neutral"
             class="cad-model"
+            :class="{ 'placing-hotspot': placementMode }"
+            @click="placeHotspot"
             @load="handleModelLoad"
             @error="handleModelError"
           >
@@ -586,6 +710,7 @@ onMounted(async () => {
               :data-position="part.position"
               :data-normal="part.normal"
               class="hotspot"
+              :disabled="placementMode"
               :class="{ active: selectedId === part.id }"
               @click.stop="selectPart(part.id)"
             >
@@ -628,6 +753,15 @@ onMounted(async () => {
               @click="rotating = !rotating"
             >
               {{ rotating ? 'STOP' : 'ROTATE' }}
+            </button>
+
+            <button
+              type="button"
+              class="placement-toggle"
+              :class="{ active: placementMode }"
+              @click="togglePlacementMode"
+            >
+              {{ placementMode ? 'EXIT PLACE MODE' : 'PLACE ON MODEL' }}
             </button>
 
             <button
@@ -737,6 +871,87 @@ onMounted(async () => {
         </option>
       </select>
 
+      <!-- ADD NEW SUBSYSTEM -->
+      <details class="part-editor-box">
+        <summary>+ ADD NEW HOTSPOT / SUBSYSTEM</summary>
+        <div class="part-editor-fields">
+          <label>Name <input v-model="newName" placeholder="e.g. Drive Motor" /></label>
+          <label>Category
+            <select v-model="newCategory">
+              <option value="Mechanical">Mechanical</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Control">Control</option>
+            </select>
+          </label>
+          <label>Description <textarea v-model="newDescription" rows="2" placeholder="Describe the subsystem" /></label>
+          <label>Documentation link <input v-model="newLink" placeholder="/design/mechanical" /></label>
+          <button type="button" class="editor-primary" @click="addHotspot">ADD HOTSPOT</button>
+        </div>
+      </details>
+
+      <!-- EDIT EXISTING SUBSYSTEM -->
+      <details class="part-editor-box">
+        <summary>EDIT SELECTED SUBSYSTEM DETAILS</summary>
+        <div v-if="editingPart" class="part-editor-fields">
+          <label>Name <input v-model="editingPart.name" /></label>
+          <label>Category
+            <select v-model="editingPart.category">
+              <option value="Mechanical">Mechanical</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Control">Control</option>
+            </select>
+          </label>
+          <label>Description <textarea v-model="editingPart.description" rows="3" /></label>
+          <label>Documentation link <input v-model="editingPart.link" /></label>
+          <label>Technical details (one per line)
+            <textarea
+              :value="editingPart.details.join('\n')"
+              rows="3"
+              @change="editingPart.details = ($event.target as HTMLTextAreaElement).value.split('\n').map(v => v.trim()).filter(Boolean)"
+            />
+          </label>
+          <div class="placement-actions">
+            <button type="button" class="editor-primary" @click="updatePartDetails">SAVE DETAILS</button>
+            <button type="button" @click="deleteHotspot">DELETE SELECTED HOTSPOT</button>
+          </div>
+        </div>
+      </details>
+      <p v-if="editorMessage" class="editor-message">{{ editorMessage }}</p>
+
+      <!-- CLICK-TO-PLACE CONTROLS -->
+      <div class="placement-panel">
+        <strong>CLICK-TO-PLACE HOTSPOT</strong>
+        <p>Choose the target subsystem above, then activate placement mode and click the actual GLB surface. The hotspot moves immediately. Save to retain the coordinates.</p>
+        <div class="placement-actions">
+          <button type="button" @click="togglePlacementMode">
+            {{ placementMode ? 'EXIT PLACE MODE' : 'START CLICK PLACEMENT' }}
+          </button>
+          <button type="button" class="primary-action" @click="savePlacedPosition">
+            SAVE SELECTED POSITION
+          </button>
+        </div>
+        <p class="placement-status" role="status">{{ placementMessage }}</p>
+        <small v-if="hasUnsavedPlacement">Unsaved position: save before refreshing the page.</small>
+      </div>
+
+      <!-- SLIDER RANGE SELECTION -->
+      <div class="range-selector">
+        <label for="range-mode">Slider movement range</label>
+        <select id="range-mode" v-model="rangeMode">
+          <option
+            v-for="(mode, key) in rangeModes"
+            :key="key"
+            :value="key"
+          >
+            {{ mode.label }}
+          </option>
+        </select>
+        <small>
+          Use Fine to position points precisely. Large ranges can
+          move hotspots far outside the visible model.
+        </small>
+      </div>
+
       <!-- XYZ SLIDERS -->
       <div class="axis-grid">
 
@@ -757,9 +972,9 @@ onMounted(async () => {
 
           <input
             type="range"
-            :min="-0.15"
-            :max="0.15"
-            :step="0.001"
+            :min="-activeRange.limit"
+            :max="activeRange.limit"
+            :step="activeRange.step"
             :value="manual[axis]"
             @input="updateAxis(
               axis,
@@ -769,9 +984,9 @@ onMounted(async () => {
 
           <input
             type="number"
-            :min="-0.5"
-            :max="0.5"
-            :step="0.001"
+            :min="-1500"
+            :max="1500"
+            :step="activeRange.step"
             :value="manual[axis]"
             @change="updateAxis(
               axis,
@@ -970,22 +1185,32 @@ onMounted(async () => {
    ========================================== */
 
 .hotspot {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  /* The model-viewer 3D position is the centre of the gold dot. */
+  position: relative;
+  display: block;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
   border: 0;
   background: transparent;
+  overflow: visible;
   cursor: pointer;
-  transform: translate(-50%, -50%);
+  /* Do not translate the combined label and dot. */
 }
 
 .hotspot-dot {
-  width: 15px;
-  height: 15px;
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
   border-radius: 50%;
   background: #d69d55;
   border: 3px solid white;
   box-shadow: 0 0 0 5px rgba(214, 157, 85, 0.25);
+  pointer-events: none;
 }
 
 .hotspot.active .hotspot-dot {
@@ -994,13 +1219,28 @@ onMounted(async () => {
 }
 
 .hotspot-label {
-  padding: 5px 8px;
+  position: absolute;
+  left: 15px;
+  top: -15px;
+  padding: 6px 10px;
   border: 1px solid #64748b;
   border-radius: 6px;
-  background: rgba(17, 24, 39, 0.92);
+  background: rgba(17, 24, 39, 0.95);
   color: white;
   font-size: 11px;
+  line-height: 16px;
   white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Expand the clickable area around the dot without moving its anchor. */
+.hotspot::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: -12px;
+  width: 24px;
+  height: 24px;
 }
 
 /* ==========================================
@@ -1146,6 +1386,33 @@ onMounted(async () => {
 /* ==========================================
    MANUAL HOTSPOT EDITOR
    ========================================== */
+
+.range-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.range-selector label {
+  color: #f5c98d;
+  font-size: 12px;
+}
+
+.range-selector select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #64748b;
+  border-radius: 7px;
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.range-selector small {
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
 
 .hotspot-editor {
   margin-top: 18px;
@@ -1324,6 +1591,19 @@ onMounted(async () => {
   line-height: 1.6;
 }
 
+/* CLICK-TO-PLACE */
+.cad-model.placing-hotspot { cursor: crosshair; }
+.cad-model.placing-hotspot .hotspot { pointer-events: none; }
+.placement-toggle.active { border-color: #d69d55; background: #7c4a19; }
+.placement-panel { margin-top: 18px; padding: 16px; border: 1px solid #475569; border-radius: 10px; background: #111e32; }
+.placement-panel strong { color: #f5c98d; font-size: 12px; letter-spacing: 1px; }
+.placement-panel p { color: #e2e8f0; font-size: 12px; line-height: 1.6; margin: 10px 0; }
+.placement-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.placement-actions button { padding: 10px 13px; border: 1px solid #d69d55; border-radius: 7px; color: white; cursor: pointer; }
+.placement-actions .primary-action { background: #925b23; }
+.placement-panel .placement-status { color: #f5c98d; }
+.placement-panel small { color: #f5c98d; }
+
 /* ==========================================
    CATEGORY FILTERS
    ========================================== */
@@ -1429,4 +1709,13 @@ onMounted(async () => {
     align-items: flex-start;
   }
 }
+
+/* Extensible subsystem editor */
+.part-editor-box { margin-top: 16px; border: 1px solid #475569; border-radius: 10px; padding: 14px; background: #111e32; }
+.part-editor-box summary { color: #f5c98d; cursor: pointer; font-size: 12px; font-weight: 700; }
+.part-editor-fields { display: grid; gap: 12px; margin-top: 14px; }
+.part-editor-fields label { display: grid; gap: 6px; color: #f5c98d; font-size: 12px; }
+.part-editor-fields input, .part-editor-fields select, .part-editor-fields textarea { width: 100%; min-width: 0; padding: 9px; border: 1px solid #64748b; border-radius: 6px; background: #1e293b; color: white; font: inherit; }
+.part-editor-fields button { width: fit-content; padding: 10px 13px; border: 1px solid #d69d55; border-radius: 7px; color: white; cursor: pointer; }
+.part-editor-fields .editor-primary { background: #925b23; }
 </style>
