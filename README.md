@@ -1,7 +1,6 @@
-# energy-aware-window-cleaning-robot
-Energy-Aware Window Cleaning Robot
+# Energy-Aware Window Cleaning Robot
 
-ME4101A Final Year Project (Dissertation)
+## ME4101A Final Year Project (Dissertation)
 
 National University of Singapore (NUS) • College of Design and Engineering (CDE)
 

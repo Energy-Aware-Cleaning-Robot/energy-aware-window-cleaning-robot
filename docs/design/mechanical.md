@@ -68,7 +68,7 @@ Weight reduction will be investigated through:
 
 <ClientOnly>
   <model-viewer
-    src="/energy-aware-window-cleaning-robot/models/chassis.glb"
+    src="/energy-aware-window-cleaning-robot/models/lightweight-cleaning-robot.glb"
     alt="Interactive 3D CAD model of the window cleaning robot chassis"
     camera-controls
     auto-rotate
