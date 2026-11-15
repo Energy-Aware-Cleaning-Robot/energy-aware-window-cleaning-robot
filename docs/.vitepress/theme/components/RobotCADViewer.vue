@@ -10,6 +10,10 @@ import {
 
 import { withBase } from 'vitepress'
 
+// Editing tools are compiled into the local development build only.
+// The public GitHub Pages build displays a read-only CAD explorer.
+const isDevelopment = import.meta.env.DEV
+
 // ==========================================
 // TYPES
 // ==========================================
@@ -333,6 +337,7 @@ function loadEditingCoordinates() {
 }
 
 function toggleEditMode() {
+  if (!isDevelopment) return
   editMode.value = !editMode.value
   if (!editMode.value) placementMode.value = false
 
@@ -357,6 +362,7 @@ function toggleEditMode() {
 // ==========================================
 
 async function updateAxis(axis: Axis, value: number) {
+  if (!isDevelopment) return
   if (placementMode.value) placementMode.value = false
   if (!Number.isFinite(value)) return
 
@@ -385,6 +391,7 @@ async function updateAxis(axis: Axis, value: number) {
 // ==========================================
 
 function togglePlacementMode() {
+  if (!isDevelopment) return
   if (!editMode.value) {
     editMode.value = true
     category.value = 'All'
@@ -397,7 +404,7 @@ function togglePlacementMode() {
 }
 
 async function placeHotspot(event: MouseEvent) {
-  if (!placementMode.value) return
+  if (!isDevelopment || !placementMode.value) return
   const mv = viewer.value
   if (!mv || !modelReady.value) {
     placementMessage.value = 'The 3D model has not finished loading.'
@@ -667,7 +674,9 @@ onMounted(async () => {
 
   await nextTick()
 
-  await loadHotspots()
+  if (isDevelopment) {
+    await loadHotspots()
+  }
 })
 </script>
 
@@ -758,6 +767,7 @@ onMounted(async () => {
             <button
               type="button"
               class="placement-toggle"
+              v-if="isDevelopment"
               :class="{ active: placementMode }"
               @click="togglePlacementMode"
             >
@@ -767,6 +777,7 @@ onMounted(async () => {
             <button
               type="button"
               class="edit-button"
+              v-if="isDevelopment"
               :class="{ active: editMode }"
               @click="toggleEditMode"
             >
@@ -835,7 +846,7 @@ onMounted(async () => {
     </div>
 
     <!-- MANUAL XYZ HOTSPOT EDITOR -->
-    <div v-if="editMode" class="hotspot-editor">
+    <div v-if="isDevelopment && editMode" class="hotspot-editor">
 
       <div class="editor-header">
         <div>
