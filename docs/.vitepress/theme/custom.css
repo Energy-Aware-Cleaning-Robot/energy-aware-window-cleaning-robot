@@ -58,11 +58,6 @@ body,
    INTERACTIVE CAD VIEWER
    ========================================== */
 
-/* Outer viewer remains dark */
-.cad-explorer {
-  background: #08090c !important;
-  color: #f3f4f6 !important;
-}
 
 /* Dark-blue 3D model background */
 .cad-stage,
@@ -74,14 +69,3 @@ body,
   ) !important;
 }
 
-/* Dark subsystem information panel */
-.cad-info {
-  background: #101012 !important;
-  color: #f3f4f6 !important;
-}
-
-/* Dark component cards */
-.subsystem-card {
-  background: #101114 !important;
-  color: #f3f4f6 !important;
-}

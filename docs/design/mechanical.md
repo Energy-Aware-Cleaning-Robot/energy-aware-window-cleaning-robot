@@ -1,7 +1,9 @@
 
 ---
 title: Mechanical Design
-description: Mechanical architecture, locomotion system, chassis optimisation and interactive 3D CAD model.
+description: Mechanical architecture, locomotion, chassis optimisation and interactive 3D CAD model.
+layout: doc
+aside: false
 outline: deep
 ---
 
@@ -15,7 +17,7 @@ The design integrates the chassis, locomotion system and suction chamber while p
 
 ## 1. Mechanical Design Overview
 
-The mechanical architecture is designed to support the following functions:
+The mechanical architecture is designed to:
 
 1. Maintain structural stability during vertical operation.
 2. Support the suction adhesion mechanism.
@@ -38,27 +40,35 @@ The mechanical architecture is designed to support the following functions:
 | Cleaning Mechanism | Under Development |
 
 ::: info Design Status
-The specifications represent preliminary design targets. Final dimensions, component selections and operating characteristics will be updated following prototype fabrication and experimental validation.
+These specifications are preliminary and will be updated following chassis optimisation, component selection and experimental validation.
 :::
 
 ---
 
 ## 2. Interactive 3D CAD Model
 
-The interactive viewer below presents the preliminary mechanical design of the window-cleaning robot.
+The interactive CAD explorer below presents the preliminary chassis design of the window-cleaning robot.
 
-The CAD model can be rotated, zoomed and inspected from different viewing angles.
-
-The subsystem selection menu provides descriptions of the chassis, locomotion system, suction mechanism and electronics.
+Visitors can rotate and zoom into the model, select hotspots positioned on the chassis, and explore the engineering descriptions of individual components.
 
 <RobotCADViewer />
 
-*Figure 1: Interactive 3D CAD model of the window-cleaning robot. Drag to rotate, scroll to zoom and select a subsystem to view its description.*
+*Figure 1: Interactive 3D CAD model and subsystem explorer of the window-cleaning robot.*
 
-::: tip Interactive Viewer
-Use the subsystem dropdown to explore the different mechanical and electrical components.
+::: tip How to Use the Interactive Viewer
+- **Left-click and drag:** Rotate the robot.
+- **Right-click and drag:** Pan around the model.
+- **Scroll:** Zoom in or out.
+- **Click a hotspot:** Display information about the selected component.
+- **Select a component card:** Open its engineering description.
+- **Select a category:** Filter the displayed subsystems.
+- **Reset:** Return to the default viewing angle.
+:::
 
-Subsystem descriptions are currently informational. Individual component highlighting and exploded views will be introduced in a future development stage.
+::: info Current CAD Model
+The current GLB model represents the preliminary chassis geometry. The hotspot coordinates are provisional and must be calibrated to the actual model.
+
+Additional components such as motors, wheels, suction fan and electronics will be incorporated as the mechanical assembly develops.
 :::
 
 ---
@@ -67,38 +77,34 @@ Subsystem descriptions are currently informational. Individual component highlig
 
 ### 3.1 Design Requirements
 
-The chassis forms the primary structural framework of the robot.
+The chassis provides the structural framework for mounting the robot's locomotion, suction and electronic components.
 
-It must support the mechanical and electrical components while maintaining sufficient rigidity during vertical climbing.
-
-The main design considerations include:
+The primary requirements include:
 
 - Low overall mass.
-- Sufficient structural strength.
+- Sufficient structural rigidity.
 - Compact geometry.
-- Ease of 3D printing and assembly.
+- Ease of manufacturing and assembly.
 - Integration of the suction chamber.
 - Accessibility for maintenance and component replacement.
 
 ### 3.2 Material Selection
 
-Polylactic Acid (PLA) is selected for the preliminary chassis prototype.
+Polylactic Acid (PLA) is selected for the preliminary chassis because of its suitability for low-cost FDM 3D printing and rapid prototyping.
 
-PLA is suitable for rapid prototyping due to its low cost, availability and compatibility with FDM 3D printing.
+The material enables multiple chassis iterations to be manufactured and evaluated.
 
-The material also allows multiple chassis iterations to be manufactured and evaluated during development.
-
-However, the final design must consider the material's mechanical properties, temperature sensitivity and long-term durability.
+However, the final design must account for mechanical loading, temperature sensitivity and long-term durability.
 
 ### 3.3 Preliminary Chassis Design
 
-The initial chassis was developed in SolidWorks using a compact square configuration.
+The initial chassis was developed using SolidWorks.
 
-The design provides mounting space for the suction system, drivetrain and electronic components.
+The design adopts a compact square configuration with a central region intended for suction chamber integration.
 
 ![Preliminary chassis design](/images/chassis-iteration-1.png)
 
-*Figure 2: Preliminary chassis design developed using SolidWorks.*
+*Figure 2: Preliminary SolidWorks chassis design.*
 
 ### 3.4 Chassis Weight Optimisation
 
@@ -108,18 +114,17 @@ $$
 m_{\text{chassis,initial}} = 532 \text{ g}
 $$
 
-Reducing the chassis mass is important because a lighter robot generally requires less gravitational climbing force.
+Reducing the chassis mass is important because a lighter robot requires less force to overcome gravity during upward climbing.
 
-The following optimisation strategies will be investigated:
+The proposed optimisation strategies include:
 
 1. Reducing unnecessary wall thickness.
 2. Removing non-load-bearing material.
 3. Integrating the suction chamber into the chassis.
 4. Optimising motor and electronics mounting locations.
-5. Reducing redundant structural features.
-6. Maintaining sufficient rigidity around critical mounting points.
+5. Maintaining adequate rigidity around critical mounting points.
 
-The final chassis mass will be obtained from the updated SolidWorks model and verified experimentally after fabrication.
+The optimised chassis mass will be determined using SolidWorks mass properties and verified after fabrication.
 
 ---
 
@@ -127,9 +132,7 @@ The final chassis mass will be obtained from the updated SolidWorks model and ve
 
 ### 4.1 Locomotion Overview
 
-The locomotion system uses motor-driven wheels to move the robot across the glass surface while suction adhesion is maintained.
-
-The drivetrain must provide sufficient traction and torque for vertical climbing.
+The locomotion system uses motor-driven wheels to move the robot along the glass surface while suction adhesion is maintained.
 
 The intended movement directions include:
 
@@ -138,13 +141,11 @@ The intended movement directions include:
 - Horizontal movement.
 - Turning and reorientation.
 
-These movements are important for evaluating direction-dependent energy consumption in the Coverage Path Planning (CPP) model.
+These movements will be characterised experimentally to determine their respective energy requirements.
 
 ### 4.2 Gravitational Force
 
-For a robot operating on a vertical surface, gravitational force acts downward.
-
-The gravitational force is calculated using:
+For a robot operating on a vertical surface, the gravitational force acts downward.
 
 $$
 F_g = mg
@@ -152,19 +153,11 @@ $$
 
 Where:
 
-| Variable | Description | Unit |
-|---|---|---|
-| $F_g$ | Gravitational force | N |
-| $m$ | Total robot mass | kg |
-| $g$ | Gravitational acceleration | m/s² |
+- $F_g$ = gravitational force (N)
+- $m$ = robot mass (kg)
+- $g$ = gravitational acceleration (m/s²)
 
-Assuming a preliminary robot mass of:
-
-$$
-m = 1.5 \text{ kg}
-$$
-
-The gravitational force becomes:
+Assuming a preliminary robot mass of 1.5 kg:
 
 $$
 F_g = 1.5(9.81)
@@ -174,13 +167,9 @@ $$
 \boxed{F_g = 14.715 \text{ N}}
 $$
 
-This represents the downward gravitational force that the locomotion system must account for during vertical operation.
-
 ### 4.3 Required Drive Force
 
-During upward climbing, the drive system must overcome gravitational loading and additional motion resistance.
-
-For a simplified upward-motion model:
+During upward climbing, the drive system must overcome gravitational loading, rolling resistance and acceleration.
 
 $$
 F_{\text{drive}} = mg + F_{rr} + ma
@@ -188,9 +177,8 @@ $$
 
 Where:
 
-- $F_{\text{drive}}$ = required total drive force (N)
-- $F_{rr}$ = rolling resistance force (N)
-- $m$ = robot mass (kg)
+- $F_{\text{drive}}$ = total required drive force (N)
+- $F_{rr}$ = rolling resistance (N)
 - $a$ = upward acceleration (m/s²)
 
 For constant-speed upward movement:
@@ -205,11 +193,7 @@ $$
 \boxed{F_{\text{drive}} = mg + F_{rr}}
 $$
 
-The rolling resistance will be determined using the selected wheel material, contact conditions and suction-induced normal loading.
-
 ### 4.4 Rolling Resistance
-
-Rolling resistance represents the resistance experienced by the wheels as they roll along the glass surface.
 
 A simplified rolling resistance model is:
 
@@ -219,19 +203,16 @@ $$
 
 Where:
 
-| Variable | Description | Unit |
-|---|---|---|
-| $F_{rr}$ | Rolling resistance | N |
-| $C_{rr}$ | Rolling resistance coefficient | - |
-| $N$ | Total wheel normal force | N |
+- $C_{rr}$ = rolling resistance coefficient
+- $N$ = total wheel normal force (N)
 
-The normal force depends on the suction system and the mechanical load distribution.
+The normal force depends on suction pressure and how the chassis transfers the suction load to the wheel contact points.
 
-The rolling resistance coefficient will be estimated or experimentally determined after wheel selection.
+The rolling resistance coefficient will be estimated or measured after wheel selection.
 
 ### 4.5 Motor Torque Requirements
 
-The required torque for each driven wheel can be estimated using:
+The torque required per driven wheel is estimated using:
 
 $$
 \tau = \frac{F_{\text{drive}}r}{n\eta}
@@ -241,7 +222,7 @@ Where:
 
 | Variable | Description | Unit |
 |---|---|---|
-| $\tau$ | Required torque per driven wheel | Nm |
+| $\tau$ | Torque per driven wheel | Nm |
 | $F_{\text{drive}}$ | Total required drive force | N |
 | $r$ | Wheel radius | m |
 | $n$ | Number of driven wheels | - |
@@ -249,19 +230,7 @@ Where:
 
 This simplified calculation assumes approximately equal force distribution among the driven wheels.
 
-The final motor selection will consider:
-
-- Required climbing torque.
-- Wheel radius.
-- Rotational speed.
-- Motor efficiency.
-- Available traction.
-- Power consumption.
-- Safety margin.
-
-::: info Motor Selection
-The motor torque calculation will be updated once the wheel dimensions, drivetrain configuration and rolling resistance have been finalised.
-:::
+The final motor selection will consider climbing torque, rotational speed, drivetrain efficiency, wheel traction and power consumption.
 
 ---
 
@@ -271,9 +240,7 @@ The motor torque calculation will be updated once the wheel dimensions, drivetra
 
 The robot uses negative-pressure suction to maintain attachment to vertical glass surfaces.
 
-A suction fan reduces the pressure inside the chamber relative to the surrounding atmosphere.
-
-The resulting pressure difference produces a force acting approximately normal to the glass surface.
+A suction fan reduces the pressure inside the chamber relative to atmospheric pressure.
 
 The theoretical suction force is:
 
@@ -283,27 +250,23 @@ $$
 
 Where:
 
-| Variable | Description | Unit |
-|---|---|---|
-| $F_{\text{suction}}$ | Theoretical suction force | N |
-| $\Delta P$ | Pressure difference | Pa |
-| $A$ | Effective sealed suction area | m² |
+- $F_{\text{suction}}$ = theoretical suction force (N)
+- $\Delta P$ = pressure difference (Pa)
+- $A$ = effective sealed suction area (m²)
 
 ### 5.2 Preliminary Suction Area
 
-The preliminary suction area considered in the design is:
+The preliminary suction area is:
 
 $$
 A = 0.06283185 \text{ m}^2
 $$
 
-The actual effective area must be verified from the final suction chamber geometry and sealing configuration.
+The effective suction area will be verified after finalising the chamber geometry.
 
-### 5.3 Required Adhesion Force
+### 5.3 Required Adhesion Pressure
 
-The suction system must generate sufficient normal loading to provide wheel traction and prevent downward slipping.
-
-The maximum available friction force can be approximated as:
+The maximum available wheel friction force is approximated by:
 
 $$
 F_{\text{friction,max}} = \mu N
@@ -311,16 +274,16 @@ $$
 
 Where:
 
-- $\mu$ = effective coefficient of friction between the wheel and glass.
-- $N$ = total wheel normal force.
+- $\mu$ = effective coefficient of friction
+- $N$ = wheel normal force (N)
 
-For the robot to remain stationary on vertical glass:
+To prevent downward slipping under static conditions:
 
 $$
 \mu N \geq mg
 $$
 
-Assuming the suction force is effectively transmitted to the wheel contact points:
+Assuming the suction force is effectively transferred to the wheel contact points:
 
 $$
 N \approx \Delta P A
@@ -329,104 +292,66 @@ $$
 Therefore:
 
 $$
-\mu \Delta P A \geq mg
-$$
-
-Rearranging:
-
-$$
 \boxed{\Delta P \geq \frac{mg}{\mu A}}
 $$
 
-This provides an initial estimate of the minimum pressure difference required to resist downward slipping.
-
-A safety factor should be included:
+Including a safety factor:
 
 $$
-\boxed{\Delta P_{\text{design}} \geq
-\frac{SF \cdot mg}{\mu A}}
+\boxed{
+\Delta P_{\text{design}}
+\geq
+\frac{SF \cdot mg}{\mu A}
+}
 $$
 
-Where $SF$ is the selected safety factor.
+Where $SF$ represents the selected safety factor.
 
 ::: warning Engineering Consideration
-This is a simplified static traction model. The actual adhesion requirement depends on wheel contact loading, chamber sealing, leakage, robot orientation, dynamic motion and possible overturning moments.
+This is a simplified static traction model. The actual adhesion requirement also depends on wheel loading, leakage, chamber sealing, robot orientation and dynamic forces.
 
-The design must be experimentally verified before unsupported vertical operation.
+Experimental validation is required before unsupported vertical operation.
 :::
 
 ### 5.4 Single Suction Chamber Design
 
-The proposed mechanical architecture incorporates a single suction chamber within the chassis.
+The proposed chassis incorporates a single suction chamber.
 
-The design aims to:
+The chamber design aims to:
 
-1. Reduce the number of suction components.
-2. Minimise additional structural mass.
-3. Maintain a suitable pressure difference.
-4. Provide sufficient wheel traction.
-5. Reduce unnecessary energy consumption.
+1. Reduce unnecessary structural mass.
+2. Provide sufficient negative-pressure adhesion.
+3. Maintain reliable contact with the glass.
+4. Minimise leakage.
+5. Reduce suction system power consumption.
 
-The chamber design will be evaluated based on:
-
-- Effective suction area.
-- Chamber geometry.
-- Sealing performance.
-- Pressure difference.
-- Fan pressure-flow characteristics.
-- Suction power consumption.
-
-### 5.5 Suction System Energy Consumption
-
-The suction fan consumes electrical energy throughout the period when adhesion is maintained.
-
-The adhesion energy can be estimated using:
-
-$$
-E_{\text{adh}} = P_{\text{adh}}T
-$$
-
-Where:
-
-- $E_{\text{adh}}$ = adhesion energy consumption (J)
-- $P_{\text{adh}}$ = average suction system electrical power (W)
-- $T$ = operating duration (s)
-
-This relationship is important because the suction system may consume energy even when the robot is stationary.
-
-Consequently, coverage paths with longer completion times may require more adhesion energy.
+The final design will consider effective suction area, chamber geometry, sealing material and fan pressure-flow characteristics.
 
 ---
 
 ## 6. Mechanical Design and Energy Efficiency
 
-The mechanical design directly influences the energy consumption of the robot.
+### 6.1 Effect of Robot Mass
 
-### 6.1 Robot Mass
-
-Reducing robot mass decreases gravitational loading during upward climbing.
-
-For a fixed climbing height:
+The gravitational potential energy gained during upward movement is:
 
 $$
-\Delta E_{\text{potential}} = mg\Delta h
+\Delta E_p = mg\Delta h
 $$
 
-A lower robot mass reduces the gravitational potential energy increase associated with climbing.
+Reducing the robot mass decreases the energy required to increase its gravitational potential energy.
 
 ### 6.2 Suction-Induced Rolling Resistance
 
-Increasing suction pressure may increase the wheel normal force.
+Increasing suction pressure can improve available wheel traction.
 
-Although this can improve available traction, it can also increase rolling resistance.
+However, additional normal loading may increase rolling resistance.
 
-Therefore, suction pressure should be sufficient for reliable adhesion without unnecessarily increasing resistance or fan power consumption.
+Therefore, the suction system must balance adhesion reliability, traction and electrical energy consumption.
 
 ### 6.3 Direction-Dependent Locomotion
 
-The robot's locomotion energy is expected to differ between upward, downward and horizontal movement.
-
-The simplified locomotion energy model is:
+The robot's locomotion energy is modelled as:
 
 $$
 E_{\text{loc}} = e_uD_u + e_dD_d + e_hD_h
@@ -437,38 +362,32 @@ Where:
 - $e_u$ = upward locomotion energy per metre (J/m)
 - $e_d$ = downward locomotion energy per metre (J/m)
 - $e_h$ = horizontal locomotion energy per metre (J/m)
-- $D_u$ = total upward distance (m)
-- $D_d$ = total downward distance (m)
-- $D_h$ = total horizontal distance (m)
+- $D_u$ = upward distance (m)
+- $D_d$ = downward distance (m)
+- $D_h$ = horizontal distance (m)
 
-The energy coefficients will be obtained experimentally after the robot prototype is operational.
-
-These measurements will subsequently be incorporated into the energy-aware CPP algorithm.
+The energy coefficients will be obtained experimentally and incorporated into the energy-aware CPP algorithm.
 
 ---
 
 ## 7. Mechanical Design Evaluation
 
-The mechanical subsystem will be evaluated using the following performance metrics.
+The mechanical subsystem will be evaluated using the following metrics:
 
 | Performance Metric | Evaluation Method |
 |---|---|
-| Chassis Mass | CAD mass properties and weighing |
+| Chassis Mass | SolidWorks mass properties and weighing |
 | Structural Rigidity | CAD analysis and physical testing |
-| Motor Torque | Theoretical calculation and experimental testing |
+| Motor Torque | Calculations and experimental measurements |
 | Wheel Traction | Vertical climbing and slip tests |
 | Suction Pressure | Differential pressure measurements |
 | Rolling Resistance | Experimental characterisation |
 | Energy Consumption | Voltage and current measurements |
-| Climbing Stability | Controlled vertical glass tests |
-
-These measurements will support the development and validation of the robot's mathematical energy model.
+| Climbing Stability | Controlled vertical glass experiments |
 
 ---
 
 ## 8. Future Development
-
-The next stages of mechanical development include:
 
 - [ ] Finalise chassis dimensions and geometry.
 - [ ] Reduce unnecessary chassis mass.
@@ -477,22 +396,24 @@ The next stages of mechanical development include:
 - [ ] Finalise the drivetrain configuration.
 - [ ] Manufacture the 3D-printed chassis.
 - [ ] Integrate the suction fan and sealing system.
-- [ ] Conduct preliminary adhesion experiments.
+- [ ] Conduct adhesion experiments.
 - [ ] Evaluate vertical climbing performance.
 - [ ] Characterise direction-dependent energy consumption.
+- [ ] Calibrate interactive CAD hotspot positions.
+- [ ] Add complete robot assembly to the 3D viewer.
 
 ::: warning Prototype Safety
-Initial vertical climbing experiments should be conducted on a secured glass panel close to the ground, with an independent mechanical safety tether and appropriate emergency stopping measures.
+Initial vertical-climbing experiments should be conducted on a secured glass panel close to the ground, with an independent mechanical safety tether and appropriate emergency stopping measures.
 :::
 
 ---
 
 ## 9. Summary
 
-The mechanical subsystem provides the foundation for the development of the energy-aware window-cleaning robot.
+The mechanical subsystem provides the structural foundation for the energy-aware window-cleaning robot.
 
-The design combines a lightweight 3D-printed chassis, motor-driven locomotion and a single negative-pressure suction chamber.
+The preliminary design combines a lightweight 3D-printed chassis, motor-driven locomotion and a single negative-pressure suction chamber.
 
 Future optimisation will focus on reducing structural mass, improving adhesion reliability and minimising locomotion resistance.
 
-Experimental measurements from the completed prototype will be used to characterise the robot's energy consumption and support the development of the energy-aware CPP algorithm.
+Experimental measurements from the completed prototype will support the development and validation of the energy-aware Coverage Path Planning algorithm.
