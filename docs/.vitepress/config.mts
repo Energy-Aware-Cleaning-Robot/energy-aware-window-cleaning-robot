@@ -191,7 +191,7 @@ export default defineConfig({
     socialLinks: [
       {
         icon: 'github',
-        link: 'https://energy-aware-window-cleaning-robot.github.io/'
+        link: 'https://github.com/Energy-Aware-Cleaning-Robot/energy-aware-window-cleaning-robot'
       }
     ],
 
