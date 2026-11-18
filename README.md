@@ -27,4 +27,4 @@ Evaluate conventional and energy-aware CPP strategies.
 Interactive FYP Website
 
 To view the live interactive project report, including mechanical design, energy modelling, CPP simulations and development progress, please visit:
-[Energy-Aware Window Cleaning Robot — Interactive FYP Report](https://bryannrj.github.io/energy-aware-window-cleaning-robot/)
+[Energy-Aware Window Cleaning Robot — Interactive FYP Report](https://github.com/energy-aware-window-cleaning-robot/)
