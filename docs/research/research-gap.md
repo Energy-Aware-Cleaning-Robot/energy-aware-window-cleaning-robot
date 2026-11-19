@@ -1,12 +1,12 @@
-# 2.6 Research Gap and Proposed Contribution
+# 3 Research Gap and Proposed Contribution
 
-## 2.6.1 Established research
+## 3.1 Established research
 
 Complete Coverage Path Planning has been extensively studied for ground-based mobile robots, including approaches that aim to cover a workspace, avoid obstacles and reduce travel distance. The literature reviewed in the report also includes wall-climbing robots, glass-façade cleaning systems and energy-aware planning methods.
 
 However, vertical robots face additional requirements: gravity affects travel direction, and the adhesion mechanism must maintain sufficient attachment force throughout operation.
 
-## 2.6.2 Identified research gap
+## 3.2 Identified research gap
 
 For a negative-pressure glass-cleaning robot, total operating energy depends on several interacting factors:
 
@@ -19,7 +19,7 @@ For a negative-pressure glass-cleaning robot, total operating energy depends on 
 
 The report identifies a gap in the **joint consideration of these costs in a computationally practical energy-aware CPP framework for a low-cost vertical glass-cleaning robot**. This is the research gap argued from the reviewed papers, not a claim that no related research exists anywhere.
 
-## 2.6.3 Proposed contribution
+## 3.3 Proposed contribution
 
 The proposed contribution is to develop and evaluate a CPP framework that:
 
@@ -30,13 +30,13 @@ The proposed contribution is to develop and evaluate a CPP framework that:
 5. Compares conventional and energy-aware paths while maintaining required coverage.
 6. Evaluates model predictions against physical measurements when experiments are available.
 
-## 2.6.4 Research hypothesis to investigate
+## 3.4 Research hypothesis to investigate
 
 A conventional path that minimises distance does **not necessarily** minimise electrical energy for a suction-based robot on vertical glass. An energy-aware planner may identify a path with lower total predicted energy by balancing direction of travel, turning and time-dependent adhesion costs.
 
 This remains a **hypothesis for evaluation**, not a demonstrated result.
 
-## 2.6.5 Intended evaluation
+## 3.5 Intended evaluation
 
 The report proposes comparing coverage rate, total energy, travel distance, number of turns, cleaning time, redundancy and tracking error. The final outcome should be based on simulated and measured values rather than illustrative tables.
 

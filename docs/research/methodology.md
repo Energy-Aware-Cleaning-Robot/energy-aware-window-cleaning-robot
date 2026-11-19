@@ -1,8 +1,8 @@
-# 3. Proposed System and Research Methodology
+# 4. Proposed System and Research Methodology
 
 This page describes the **planned research workflow** in the report. It separates proposed simulation assumptions and experimental activities from results that have not yet been validated.
 
-## 3.1 Overall research methodology
+## 4.1 Overall research methodology
 
 ```mermaid
 flowchart TD
@@ -19,7 +19,7 @@ flowchart TD
 
 The research starts by reviewing wall-climbing robot adhesion and CPP literature. A low-cost suction-based prototype is then intended to provide direction-specific movement and adhesion measurements. These measurements will inform an energy model used to compare coverage strategies in Python. Experimental trials are intended to test whether predicted energy differences are reflected in physical operation.
 
-## 3.2 Operating scenario and system requirements
+## 4.2 Operating scenario and system requirements
 
 ### Initial scenario
 
@@ -44,7 +44,7 @@ The introduction mentions a 50 × 50 cm physical glass panel. The methodology dr
 
 The proposed prototype should maintain adhesion, execute planned coverage trajectories, cover the target surface, measure energy consumption, track position and path, and remain low-cost to construct.
 
-## 3.3 Performance metrics
+## 4.3 Performance metrics
 
 | Metric | Unit | Purpose |
 | --- | --- | --- |
@@ -56,7 +56,7 @@ The proposed prototype should maintain adhesion, execute planned coverage trajec
 | Cleaning time | s | Total operation duration |
 | Tracking error | m or another defined error measure | Difference between planned and actual trajectory |
 
-## 3.4 Energy characterisation and modelling
+## 4.4 Energy characterisation and modelling
 
 The initial mathematical model combines locomotion, adhesion, turning and cleaning:
 
@@ -74,17 +74,17 @@ E = \int V(t)I(t)\,dt
 
 The energy coefficients are intended to be determined from directional movement tests, adhesion power measurements and turning tests.
 
-## 3.5 Coverage-path simulation
+## 4.5 Coverage-path simulation
 
 The report proposes comparing **horizontal sweep, vertical sweep, spiral and reciprocating/boustrophedon** paths. For each path, the Python framework is intended to calculate trajectory, movement direction, travel distance, number of turns, completion time, coverage and estimated energy.
 
 The preliminary simulation assumes a flat obstacle-free façade, constant speed, fixed robot dimensions, fixed cleaning width, continuous adhesion and no slipping. The first simulation does **not** model changing water mass.
 
-## 3.6 Sensitivity analysis
+## 4.6 Sensitivity analysis
 
 The proposed sensitivity study varies upward, downward and horizontal energy-per-metre coefficients, suction power, energy per turn and robot speed. The objective is to determine whether changes in these assumptions alter the preferred coverage path.
 
-## 3.7 Experimental validation plan
+## 4.7 Experimental validation plan
 
 The report proposes physical testing to compare the simulation and robot measurements.
 
@@ -96,7 +96,7 @@ The report proposes physical testing to compare the simulation and robot measure
 
 A proposed sequence is to measure directional movement energy, vacuum power and turning energy, then run comparable CPP trajectories on the physical robot. The final report should present measured values and differences from simulation only after testing.
 
-## 3.8 Research deliverables and next sections
+## 4.8 Research deliverables and next sections
 
 The methodology leads to the [Robot Design](/design/) documentation, [Energy Model](/software/energy-model), [CPP Algorithms](/software/cpp), [Simulation](/software/simulation) and [Results](/results/) pages.
 
